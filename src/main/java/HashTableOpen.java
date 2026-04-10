@@ -1,3 +1,4 @@
+//333204
 public class HashTableOpen {
 
     private static class Node{
@@ -55,6 +56,10 @@ public class HashTableOpen {
     public void delete(int num){
         this.breadCrumbs += "Hash ";
         int hashedNum = hash(num);
+        if (this.table[hashedNum] == null){
+            this.breadCrumbs += "BucketEmpty ";
+            return ;
+        }
         if (this.table[hashedNum].value == num){
             this.breadCrumbs += "First ";
             this.table[hashedNum] = this.table[hashedNum].next;
@@ -65,17 +70,23 @@ public class HashTableOpen {
         this.breadCrumbs += "NotFirst ";
         this.breadCrumbs += "CallFind ";
         Node nodeBeforeNeeded = findNodeBeforeNeeded(num);
-        if (nodeBeforeNeeded != null){
+        if (nodeBeforeNeeded.next != null){
             this.breadCrumbs += "Found ";
             nodeBeforeNeeded.next = nodeBeforeNeeded.next.next;
             this.breadCrumbs += "Deleted ";
+        } else{
+            this.breadCrumbs += "NotFound ";
         }
-        this.breadCrumbs += "NotFound ";
     }
 
     public boolean find(int num){
         int hashedNum = hash(num);
         this.breadCrumbs += "Hash ";
+
+        if (this.table[hashedNum] == null){
+            this.breadCrumbs += "EmptyBucket ";
+            return false;
+        }
 
         if (this.table[hashedNum].value == num){
             this.breadCrumbs += "First ";
@@ -85,7 +96,7 @@ public class HashTableOpen {
         this.breadCrumbs += "NotFirst ";
         this.breadCrumbs += "CallFind ";
         Node nodeBeforeNeeded = findNodeBeforeNeeded(num);
-        if (nodeBeforeNeeded != null){
+        if (nodeBeforeNeeded.next != null){
             this.breadCrumbs += "Found ";
             return true;
         }
