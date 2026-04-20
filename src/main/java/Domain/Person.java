@@ -1,33 +1,50 @@
 package Domain;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class Person {
     private Head[] heads;
-    private List<Emotion> emotions = new ArrayList<>();
+    private Map<Emotion, Float> emotions = new HashMap<>();
     private String name;
     private Room location;
-    private PersonPercepion perception;
+    private PersonPerception perception;
+    private List<Observation> observations = new ArrayList<>();
 
-    public Person(){
+    public Person() {
         this.name = "Unknown";
     }
 
-    public Person(String name, int headsAmount, PersonPercepion perception){
+    public Person(String name, int headsAmount, PersonPerception perception) {
         this.name = name;
-        this.heads = new Head[headsAmount];
-        for (int i = 0; i < headsAmount; i++){
-            Head newHead = new Head();
-            this.heads[i] = newHead;
-        }
         this.perception = perception;
 
+        this.heads = new Head[headsAmount];
+        for (int i = 0; i < headsAmount; i++) {
+            this.heads[i] = new Head();
+        }
     }
 
-    public void setLocation(Room r){
-        this.location =  r;
+    public void feelEmotion(Emotion emotion, float level) {
+        emotions.merge(emotion, level, Float::sum);
     }
 
+    public void decayEmotions(float decayRate) {
+        emotions.replaceAll((e, level) -> Math.max(0f, level - decayRate));
+    }
 
+    public Map<Emotion, Float> getEmotions() {
+        return emotions;
+    }
+
+    public void setLocation(Room r) {
+        this.location = r;
+    }
+
+    public PersonPerception getPerception() {
+        return perception;
+    }
+
+    public void observe(Observation o) {
+        observations.add(o);
+    }
 }
