@@ -1,16 +1,16 @@
 //333204
 public class HashTableOpen {
 
-    private static class Node{
-        int value;
+    private static class Node {
+        String value;
         Node next;
 
-        public Node(int value){
+        public Node(String value) {
             this.value = value;
             this.next = null;
         }
-
     }
+
     public String breadCrumbs = "";
 
     public void clearBreadcrumbs() {
@@ -20,88 +20,106 @@ public class HashTableOpen {
     private int size;
     private Node[] table;
 
-    public HashTableOpen(int size){
+    public HashTableOpen(int size) {
         this.size = size;
         this.table = new Node[size];
     }
 
-    private int hash(int num){
-        return num % size;
+    private int hash(String str) {
+        int h = 0;
+        for (int i = 0; i < str.length(); i++) {
+            h = 31 * h + str.charAt(i);
+        }
+        return (h & 0x7FFFFFFF) % size;
     }
 
-    private Node findNodeBeforeNeeded(int num){
+    private Node findNodeBeforeNeeded(String value) {
         this.breadCrumbs += "Hash ";
-        int hashedNum = hash(num);
-        Node currentNode = this.table[hashedNum];
+        int hashed = hash(value);
+        Node currentNode = this.table[hashed];
+
         this.breadCrumbs += "StartFindCycle ";
-        while (currentNode != null &&  currentNode.next != null && currentNode.next.value != num){
+        while (currentNode != null &&
+                currentNode.next != null &&
+                !currentNode.next.value.equals(value)) {
             currentNode = currentNode.next;
         }
         this.breadCrumbs += "EndFindCycle ";
         return currentNode;
-
     }
 
-    public void insert(int num){
+    public void insert(String value) {
         this.breadCrumbs += "Hash ";
-        int hashedNum = hash(num);
+        int hashed = hash(value);
+
         this.breadCrumbs += "CreateNode ";
-        Node newNode = new Node(num);
+        Node newNode = new Node(value);
+
         this.breadCrumbs += "SetNextNode ";
-        newNode.next = this.table[hashedNum];
+        newNode.next = this.table[hashed];
+
         this.breadCrumbs += "SetNewHead ";
-        this.table[hashedNum] = newNode;
+        this.table[hashed] = newNode;
     }
 
-    public void delete(int num){
+    public void delete(String value) {
         this.breadCrumbs += "Hash ";
-        int hashedNum = hash(num);
-        if (this.table[hashedNum] == null){
+        int hashed = hash(value);
+
+        if (this.table[hashed] == null) {
             this.breadCrumbs += "BucketEmpty ";
-            return ;
+            return;
         }
-        if (this.table[hashedNum].value == num){
+
+        if (this.table[hashed].value.equals(value)) {
             this.breadCrumbs += "First ";
-            this.table[hashedNum] = this.table[hashedNum].next;
+            this.table[hashed] = this.table[hashed].next;
             this.breadCrumbs += "MoveHead ";
             return;
         }
 
         this.breadCrumbs += "NotFirst ";
         this.breadCrumbs += "CallFind ";
-        Node nodeBeforeNeeded = findNodeBeforeNeeded(num);
-        if (nodeBeforeNeeded.next != null){
+
+        Node nodeBefore = findNodeBeforeNeeded(value);
+
+        if (nodeBefore.next != null) {
             this.breadCrumbs += "Found ";
-            nodeBeforeNeeded.next = nodeBeforeNeeded.next.next;
+            nodeBefore.next = nodeBefore.next.next;
             this.breadCrumbs += "Deleted ";
-        } else{
+        } else {
             this.breadCrumbs += "NotFound ";
         }
     }
 
-    public boolean find(int num){
-        int hashedNum = hash(num);
+    public boolean find(String value) {
+        int hashed = hash(value);
         this.breadCrumbs += "Hash ";
 
-        if (this.table[hashedNum] == null){
+        if (this.table[hashed] == null) {
             this.breadCrumbs += "EmptyBucket ";
             return false;
         }
 
-        if (this.table[hashedNum].value == num){
+        if (this.table[hashed].value.equals(value)) {
             this.breadCrumbs += "First ";
             this.breadCrumbs += "Found ";
             return true;
         }
+
         this.breadCrumbs += "NotFirst ";
         this.breadCrumbs += "CallFind ";
-        Node nodeBeforeNeeded = findNodeBeforeNeeded(num);
-        if (nodeBeforeNeeded.next != null){
+
+        Node nodeBefore = findNodeBeforeNeeded(value);
+
+        if (nodeBefore.next != null) {
             this.breadCrumbs += "Found ";
             return true;
         }
+
         this.breadCrumbs += "NotFound ";
         return false;
     }
+
 
 }
