@@ -11,6 +11,10 @@ public class EmotionEngine {
                 .getOrDefault(o.getWeirdnessType(), 0f);
 
         float score = o.getWeirdnessLevel().value() * perception;
+        
+        if (score <= 0f) {
+            return;
+        }
 
         p.feelEmotion(Emotion.SHOCKED, score);
     }

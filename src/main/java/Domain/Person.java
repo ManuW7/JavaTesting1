@@ -51,6 +51,9 @@ public class Person {
     }
 
     public void feelEmotion(Emotion emotion, float level) {
+        if (emotion == null) {
+            throw new NullPointerException("Emotion cannot be null");
+        }
         emotions.merge(emotion, level, Float::sum);
     }
 
