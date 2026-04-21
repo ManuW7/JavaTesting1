@@ -1,13 +1,15 @@
 package Domain;
 
 public class Observation {
-    private Object observationObject;
-    private WeirdnessType weirdnessType;
-    private WeirdnessLevel weirdnessLevel;
+    private final Object observationObject;
+    private final WeirdnessType weirdnessType;
+    private final WeirdnessLevel weirdnessLevel;
 
-    public Observation(Object objectName, WeirdnessType weirdnessType,
+    public Observation(Object observationObject,
+                       WeirdnessType weirdnessType,
                        WeirdnessLevel weirdnessLevel) {
-        this.observationObject = objectName;
+
+        this.observationObject = observationObject;
         this.weirdnessType = weirdnessType;
         this.weirdnessLevel = weirdnessLevel;
     }
@@ -16,11 +18,11 @@ public class Observation {
         return observationObject;
     }
 
-    public WeirdnessLevel getWeirdnessLevel() {
-        return weirdnessLevel;
-    }
-
     public WeirdnessType getWeirdnessType() {
         return weirdnessType;
+    }
+
+    public WeirdnessLevel getWeirdnessLevel() {
+        return weirdnessLevel;
     }
 }

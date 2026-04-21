@@ -4,6 +4,5 @@ public enum Emotion {
     NERVOUS,
     SHOCKED,
     CONFUSED
-
-
+    
 }
