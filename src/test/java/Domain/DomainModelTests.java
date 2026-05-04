@@ -17,8 +17,6 @@ public class DomainModelTests {
 
         assertEquals("Arthur", person.getName());
         assertEquals(1, person.getHeads().length);
-
-        // perception может быть пустым, но не null
         assertNotNull(person.getPerception());
         assertTrue(person.getPerception().getPerception().isEmpty());
     }
@@ -197,7 +195,7 @@ public class DomainModelTests {
 
         assertTrue(p.getEmotions().isEmpty());
     }
-    
+
     @Test
     void personShouldEnterRoom() {
         Room room = new Room();
@@ -221,4 +219,191 @@ public class DomainModelTests {
 
         assertEquals(2, room.getVisitors().size());
     }
+
+
+    @Test
+    void shouldReturnCalmWhenNoEmotions() {
+        Person p = new Person("Test", 1, new PersonPerception(Map.of()));
+
+        assertEquals(PersonState.CALM, p.evaluateState());
+    }
+
+    @Test
+    void shouldReturnNervous() {
+        Person p = new Person("Test", 1, new PersonPerception(Map.of()));
+        p.feelEmotion(Emotion.NERVOUS, 1.0f);
+
+        assertEquals(PersonState.NERVOUS, p.evaluateState());
+    }
+
+    @Test
+    void shouldReturnShocked() {
+        Person p = new Person("Test", 1, new PersonPerception(Map.of()));
+        p.feelEmotion(Emotion.SHOCKED, 1.0f);
+
+        assertEquals(PersonState.SHOCKED, p.evaluateState());
+    }
+
+    @Test
+    void shouldReturnDisbelief() {
+        Person p = new Person("Test", 1, new PersonPerception(Map.of()));
+        p.feelEmotion(Emotion.SHOCKED, 3.0f);
+
+        assertEquals(PersonState.DISBELIEF, p.evaluateState());
+    }
+
+    @Test
+    void shouldReturnOverwhelmed() {
+        Person p = new Person("Test", 1, new PersonPerception(Map.of()));
+        p.feelEmotion(Emotion.SHOCKED, 6.0f);
+
+        assertEquals(PersonState.OVERWHELMED, p.evaluateState());
+    }
+
+    @Test
+    void shouldReturnJawDropped() {
+        Person p = new Person("Test", 1, new PersonPerception(Map.of()));
+        p.feelEmotion(Emotion.SHOCKED, 9.0f);
+
+        assertEquals(PersonState.JAW_DROPPED, p.evaluateState());
+    }
+
+
+    @Test
+    void tickShouldDecayEmotions() {
+        Person p = new Person("Test", 1, new PersonPerception(Map.of()));
+        p.feelEmotion(Emotion.SHOCKED, 1.0f);
+
+        EmotionEngine engine = new EmotionEngine();
+        engine.tick(p);
+
+        assertTrue(p.getEmotions().get(Emotion.SHOCKED) < 1.0f);
+    }
+
+
+    @Test
+    void shouldStoreObservation() {
+        Person p = new Person("Test", 1, new PersonPerception(Map.of()));
+
+        Observation o = new Observation(
+                new Object(),
+                WeirdnessType.BODY_WEIRDNESS,
+                WeirdnessLevel.LOW
+        );
+
+        p.observe(o);
+
+        assertEquals(1, p.getObservations().size());
+        assertEquals(o, p.getObservations().get(0));
+    }
+
+
+    @Test
+    void shouldReturnCorrectHead() {
+        Person p = new Person("Test", 2, new PersonPerception(Map.of()));
+
+        assertNotNull(p.getHead(0));
+        assertNotNull(p.getHead(1));
+    }
+
+    @Test
+    void getHeadShouldThrowOnInvalidIndex() {
+        Person p = new Person("Test", 1, new PersonPerception(Map.of()));
+
+        assertThrows(ArrayIndexOutOfBoundsException.class, () ->
+                p.getHead(5)
+        );
+    }
+
+
+    @Test
+    void observationShouldReturnValues() {
+        Object obj = new Object();
+
+        Observation o = new Observation(
+                obj,
+                WeirdnessType.BODY_WEIRDNESS,
+                WeirdnessLevel.HIGH
+        );
+
+        assertEquals(obj, o.getObservationObject());
+        assertEquals(WeirdnessType.BODY_WEIRDNESS, o.getWeirdnessType());
+        assertEquals(WeirdnessLevel.HIGH, o.getWeirdnessLevel());
+    }
+
+
+    @Test
+    void environmentObjectShouldStoreName() {
+        EnvironmentObject obj = new EnvironmentObject("Chair");
+
+        assertEquals("Chair", obj.getName());
+    }
+
+    @Test
+    void poseShouldStoreDescription() {
+        Pose pose = new Pose("sitting relaxed");
+
+        assertEquals("sitting relaxed", pose.getDescription());
+    }
+
+    @Test
+    void personShouldStorePose() {
+        Person p = new Person("Test", 1, new PersonPerception(Map.of()));
+        Pose pose = new Pose("lying");
+
+        p.setPose(pose);
+
+        assertEquals(pose, p.getPose());
+    }
+
+    @Test
+    void actionShouldReturnDescription() {
+        Action action = new Action("smiling");
+
+        assertEquals("smiling", action.getDescription());
+    }
+
+    @Test
+    void headShouldReturnId() {
+        Head head = new Head(42);
+
+        assertEquals(42, head.getId());
+    }
+
+    @Test
+    void headShouldThrowOnNullAction() {
+        Head head = new Head(1);
+
+        assertThrows(IllegalArgumentException.class, () ->
+                head.startAction(null)
+        );
+    }
+
+    @Test
+    void builderShouldStorePerceptionCorrectly() {
+        Person person = new PersonBuilder()
+                .withName("Test")
+                .withHeadsAmount(1)
+                .withPerception(WeirdnessType.BODY_WEIRDNESS, 0.7f)
+                .build();
+
+        float value = person.getPerception()
+                .getPerception()
+                .get(WeirdnessType.BODY_WEIRDNESS);
+
+        assertEquals(0.7f, value);
+    }
+
+    @Test
+    void builderShouldSupportChaining() {
+        PersonBuilder builder = new PersonBuilder();
+
+        PersonBuilder result = builder.withPerception(
+                WeirdnessType.BODY_WEIRDNESS, 0.5f
+        );
+
+        assertSame(builder, result);
+    }
+
+
 }

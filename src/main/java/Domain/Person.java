@@ -13,9 +13,6 @@ public class Person {
     private List<Observation> observations = new ArrayList<>();
     private Pose pose;
 
-    public Person() {
-        this.name = "Unknown";
-    }
 
     public Person(String name, int headsAmount, PersonPerception perception) {
         this.name = name;
@@ -96,5 +93,33 @@ public class Person {
 
     public String getName() {
         return name;
+    }
+
+    public PersonState evaluateState() {
+
+        float shocked = emotions.getOrDefault(Emotion.SHOCKED, 0f);
+        float nervous = emotions.getOrDefault(Emotion.NERVOUS, 0f);
+
+        if (shocked > 8.0f) {
+            return PersonState.JAW_DROPPED;
+        }
+
+        if (shocked > 5.0f) {
+            return PersonState.OVERWHELMED;
+        }
+
+        if (shocked > 2.5f) {
+            return PersonState.DISBELIEF;
+        }
+
+        if (shocked > 0f) {
+            return PersonState.SHOCKED;
+        }
+
+        if (nervous > 0f) {
+            return PersonState.NERVOUS;
+        }
+
+        return PersonState.CALM;
     }
 }

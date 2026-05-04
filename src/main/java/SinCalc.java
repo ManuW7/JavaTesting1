@@ -1,7 +1,6 @@
 public class SinCalc {
 
     public static double sin(double x, double eps) {
-        // Добавили после ошибки на больших значениях
         x = x % (2 * Math.PI);
         if (x > Math.PI) {
             x -= 2 * Math.PI;
